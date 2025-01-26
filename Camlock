@@ -54,7 +54,7 @@ local function StartLocking()
             local head = character:FindFirstChild("Head")
 
             if head then
-                local goalPosition = closestGoal.Position + Vector3.new(0, 19, 0) -- Offset for better view
+                local goalPosition = closestGoal.Position + Vector3.new(0, 22, 0) -- Offset for better view
                 Camera.CFrame = CFrame.new(Camera.CFrame.Position, goalPosition)
             end
         end
