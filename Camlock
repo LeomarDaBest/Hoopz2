@@ -15,7 +15,13 @@ else
     print("CursorButton found successfully.")
 end
 
--- Function to find the nearest goal
+-- Function to check if the player has a ball
+local function PlayerHasBall()
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    return character:FindFirstChild("Basketball") ~= nil -- Adjust if the ball has a different name
+end
+
+-- Function to find the closest goal
 local function GetClosestGoal()
     local closestDistance = math.huge
     local closestGoal = nil
@@ -54,18 +60,19 @@ local function StartLocking()
             local head = character:FindFirstChild("Head")
 
             if head then
-                local goalPosition = closestGoal.Position + Vector3.new(2, 32, 2)
+                -- Aim higher by adjusting Y offset (increase 10 -> higher aim)
+                local goalPosition = closestGoal.Position + Vector3.new(0, 10, 0) 
                 Camera.CFrame = CFrame.new(Camera.CFrame.Position, goalPosition)
             end
         end
     end)
 
-    -- Simulate button click
-    if Button then
+    -- Simulate button click (only if player has the ball)
+    if PlayerHasBall() and Button then
         firesignal(Button.MouseButton1Click)
-        print("Button clicked.")
+        print("Button clicked. Player had the ball.")
     else
-        warn("Button object not found. Ensure the UI is loaded properly.")
+        warn("Player does not have the ball, shot not triggered.")
     end
 end
 
@@ -80,12 +87,13 @@ local function StopLocking()
     end
 end
 
--- Listen for the player jumping and stop locking when they land
-local function onJumping(isJumping)
-    if isJumping then
+-- Detect when the player jumps
+local function onJumping()
+    if PlayerHasBall() then -- Check if player has the ball before triggering
+        print("Player jumped with the ball. Locking onto the closest goal.")
         StartLocking()
     else
-        StopLocking()
+        print("Player jumped without the ball. No action taken.")
     end
 end
 
