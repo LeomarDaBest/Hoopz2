@@ -1,0 +1,117 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Player = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Check if the player is on mobile or PC
+local isMobile = UserInputService.TouchEnabled
+
+-- Wait for necessary objects to exist
+local success, Button = pcall(function()
+    return Player:WaitForChild("PlayerGui"):WaitForChild("PowerUI"):WaitForChild("CursorButton")
+end)
+
+if not success or not Button then
+    warn("Failed to find CursorButton in PowerUI. Ensure the UI exists and is properly loaded.")
+    return
+else
+    print("CursorButton found successfully.")
+end
+
+-- Function to check if the player has a ball
+local function PlayerHasBall()
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    return character:FindFirstChild("Basketball") ~= nil -- Adjust if the ball has a different name
+end
+
+-- Function to find the closest goal
+local function GetClosestGoal()
+    local closestDistance = math.huge
+    local closestGoal = nil
+
+    for _, obj in pairs(workspace.Courts:GetDescendants()) do
+        if obj.Name == "Swish" and obj.Parent:FindFirstChildOfClass("TouchTransmitter") then
+            local character = Player.Character or Player.CharacterAdded:Wait()
+            local torso = character:FindFirstChild("HumanoidRootPart")
+
+            if torso then
+                local distance = (torso.Position - obj.Parent.Position).Magnitude
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestGoal = obj.Parent
+                end
+            end
+        end
+    end
+
+    return closestGoal
+end
+
+-- Variables to manage camera locking
+local isLocking = false
+local connection
+
+-- Start locking the camera to the nearest goal
+local function StartLocking()
+    if isLocking then return end
+    isLocking = true
+
+    connection = RunService.RenderStepped:Connect(function()
+        local closestGoal = GetClosestGoal()
+        if closestGoal then
+            local character = Player.Character or Player.CharacterAdded:Wait()
+            local head = character:FindFirstChild("Head")
+
+            if head then
+                -- Aim higher by adjusting Y offset (increase 10 -> higher aim)
+                local goalPosition = closestGoal.Position + Vector3.new(0, 32, 0) 
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, goalPosition)
+            end
+        end
+    end)
+
+    -- Handle Mobile vs PC controls
+    if isMobile then
+        if PlayerHasBall() and Button then
+            firesignal(Button.MouseButton1Click) -- Simulate button press on mobile
+            print("Mobile: Button clicked. Player had the ball.")
+        else
+            warn("Mobile: Player does not have the ball, shot not triggered.")
+        end
+    else
+        print("PC: Camera locked onto the goal.")
+    end
+end
+
+-- Stop locking the camera
+local function StopLocking()
+    if not isLocking then return end
+    isLocking = false
+
+    if connection then
+        connection:Disconnect()
+        connection = nil
+    end
+end
+
+-- Detect when the player jumps
+local function onJumping()
+    if PlayerHasBall() then -- Check if player has the ball before triggering
+        print("Player jumped with the ball. Locking onto the closest goal.")
+        StartLocking()
+    else
+        print("Player jumped without the ball. No action taken.")
+    end
+end
+
+-- Connect the jumping event
+local character = Player.Character or Player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+humanoid.Jumping:Connect(onJumping)
+humanoid.StateChanged:Connect(function(_, newState)
+    if newState == Enum.HumanoidStateType.Landed then
+        StopLocking()
+    end
+end)
