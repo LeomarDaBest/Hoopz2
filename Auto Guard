@@ -1,47 +1,26 @@
 local tr = false
 local Mouse = game.Players.LocalPlayer:GetMouse()
-local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
 
--- Function to handle the movement logic
-local function moveToPlayer(player)
-    local char = Players.LocalPlayer.Character
-    while tr do
-        if player.Character and player.Character:FindFirstChild("Torso") and char and char:FindFirstChild("Humanoid") then
-            if player.Character.Torso.Velocity.magnitude > 0.5 and player.Character:FindFirstChild("Basketball") then
-                char.Humanoid:MoveTo(player.Character.Torso.Position + player.Character.Torso.Velocity.unit * 7)
-            elseif player.Character.Torso.Velocity.magnitude < 0.5 and player.Character:FindFirstChild("Basketball") then
-                char.Humanoid:MoveTo(player.Character.Torso.Position)
-            else
-                if not player.Character:FindFirstChild("Basketball") then
-                    return -- Stops the function only when the target no longer has the ball
-                end
-            end
-        else
-            return -- Stops the function if the player or character is invalid
-        end
-        task.wait(0.1)
-    end
-end
-
--- Function to start tracking
-local function startTracking()
-    for _, v in pairs(Players:GetPlayers()) do
-        local char = Players.LocalPlayer.Character
-        if v ~= Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Torso") and char and char:FindFirstChild("Torso") then
-            if (v.Character.Torso.Position - char.Torso.Position).Magnitude < 25 then
-                coroutine.wrap(moveToPlayer)(v)
-            end
-        end
-    end
-end
-
--- InputBegan event listener
-UserInputService.InputBegan:Connect(function(key, gpe)
-    if key.KeyCode == Enum.KeyCode.Z and not gpe then
-        if not tr then
-            tr = true
-            startTracking()
-        end
-    end
-end)
+game:GetService("UserInputService").InputBegan:Connect(function(key, gpe)
+   if key.KeyCode == Enum.KeyCode.Z and not gpe and tr == false then
+           tr = true
+           for i, v in pairs(game.Players:GetPlayers()) do
+               local char = game.Players.LocalPlayer.Character
+               if v.Name ~= char.Name and (v.Character.Torso.CFrame.p - char.Torso.CFrame.p).Magnitude < 25 then
+                   while tr == true do
+                       if v.Character.Torso.Velocity.magnitude > 0.5 and v.Character:FindFirstChild("Basketball") then
+                           char.Humanoid:MoveTo(v.Character.Torso.CFrame.p + v.Character.Torso.Velocity.unit * 7)
+                       elseif v.Character.Torso.Velocity.magnitude < 0.5 and v.Character:FindFirstChild("Basketball") then
+                           char.Humanoid:MoveTo(v.Character.Torso.CFrame.p)
+                       elseif not v.Character:FindFirstChild("Basketball") then
+                           tr = false
+                       end
+                        task.wait(0.1)
+                   end
+               end
+           end
+       elseif key.KeyCode == Enum.KeyCode.Z and not gpe and tr == true then
+           tr = false
+       end
+   end
+)
