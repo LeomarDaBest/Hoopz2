@@ -61,7 +61,7 @@ local function StartLocking()
 
             if head then
                 -- Aim higher by adjusting Y offset (increase 10 -> higher aim)
-                local goalPosition = closestGoal.Position + Vector3.new(0, 10, 0) 
+                local goalPosition = closestGoal.Position + Vector3.new(0, 9, 0) 
                 Camera.CFrame = CFrame.new(Camera.CFrame.Position, goalPosition)
             end
         end
