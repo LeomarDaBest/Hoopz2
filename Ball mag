@@ -1,0 +1,13 @@
+local plr = game.Players.LocalPlayer
+local ball = nil
+for i, v in pairs(game:GetService("Workspace"):GetDescendants()) do
+    if v:IsA("Part") and v.Name == ("Basketball") then
+
+Basketball = v
+
+firetouchinterest(v, plr.Character.HumanoidRootPart, 0)
+wait()
+firetouchinterest(v, plr.Character.HumanoidRootPart, 1)
+
+    end
+end
