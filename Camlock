@@ -1,9 +1,26 @@
+-- Move PracticeArea if necessary
+local practiceArea = workspace:WaitForChild("PracticeArea", 5) -- Wait up to 5 seconds for PracticeArea
+if practiceArea then
+    print("PracticeArea found.")
+    local courts = workspace:FindFirstChild("Courts")
+    if courts then
+        print("Courts folder found.")
+        practiceArea.Parent = courts
+        print("PracticeArea successfully moved to Courts.")
+    else
+        warn("Courts folder not found in workspace. Ensure it exists.")
+    end
+else
+    warn("PracticeArea not found in workspace after waiting. Ensure the name and structure are correct.")
+end
+
+-- Camera Locking System
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- Wait for necessary objects to exist
+-- Wait for necessary UI objects
 local success, Button = pcall(function()
     return Player:WaitForChild("PlayerGui"):WaitForChild("PowerUI"):WaitForChild("CursorButton")
 end)
