@@ -40,7 +40,7 @@ local MainTab = Window:CreateTab("Main", nil) -- Title, Image
 local MainSection = MainTab:CreateSection("Useful") -- Changed 'Tab' to 'MainTab'
 
 local Button = MainTab:CreateButton({
-    Name = "Camlock",
+    Name = "Mobile Camlock",
     Callback = function()
         -- The function that takes place when the button is pressed
         loadstring(game:HttpGet("https://raw.githubusercontent.com/PunchMadeScript/Vision-Hoopz/refs/heads/main/Camlock"))();
