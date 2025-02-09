@@ -48,7 +48,7 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
-    Name = "Auto Guard (Z)",
+    Name = "Auto Guard (U)",
     Callback = function()
         -- The function that takes place when the button is pressed
         loadstring(game:HttpGet("https://raw.githubusercontent.com/PunchMadeScript/Vision-Hoopz/refs/heads/main/Auto%20Guard"))();
@@ -60,13 +60,5 @@ local Button = MainTab:CreateButton({
     Callback = function()
         -- The function that takes place when the button is pressed
         loadstring(game:HttpGet("https://raw.githubusercontent.com/PunchMadeScript/Vision-Hoopz/refs/heads/main/PC%20Camlock"))();
-    end,
-})
-
-local Button = MainTab:CreateButton({
-    Name = "Ball Mag (testing)",
-    Callback = function()
-        -- The function that takes place when the button is pressed
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/PunchMadeScript/Vision-Hoopz/refs/heads/main/Ball%20mag"))();
     end,
 })
