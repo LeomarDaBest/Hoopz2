@@ -15,7 +15,7 @@ game:GetService("UserInputService").InputBegan:Connect(function(key, gpe)
                    elseif not v.Character:FindFirstChild("Basketball") then
                        tr = false
                    end
-                   task.wait(0.5) -- Added wait time here
+                   task.wait(0.3) -- Added wait time here
                end
            end
        end
