@@ -3,24 +3,27 @@ local Mouse = game.Players.LocalPlayer:GetMouse()
 
 game:GetService("UserInputService").InputBegan:Connect(function(key, gpe)
    if key.KeyCode == Enum.KeyCode.U and not gpe and tr == false then
-           tr = true
-           for i, v in pairs(game.Players:GetPlayers()) do
-               local char = game.Players.LocalPlayer.Character
-               if v.Name ~= char.Name and (v.Character.Torso.CFrame.p - char.Torso.CFrame.p).Magnitude < 25 then
-                   while tr == true do
-                       if v.Character.Torso.Velocity.magnitude > 0.5 and v.Character:FindFirstChild("Basketball") then
-                           char.Humanoid:MoveTo(v.Character.Torso.CFrame.p + v.Character.Torso.Velocity.unit * 7)
-                       elseif v.Character.Torso.Velocity.magnitude < 0.5 and v.Character:FindFirstChild("Basketball") then
-                           char.Humanoid:MoveTo(v.Character.Torso.CFrame.p)
-                       elseif not v.Character:FindFirstChild("Basketball") then
-                           tr = false
-                       end
-                        task.wait()
+       tr = true
+       for i, v in pairs(game.Players:GetPlayers()) do
+           local char = game.Players.LocalPlayer.Character
+           local targetChar = v.Character
+           local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
+           local charTorso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+
+           if v.Name ~= char.Name and torso and charTorso and (torso.CFrame.p - charTorso.CFrame.p).Magnitude < 25 then
+               while tr == true do
+                   if torso.Velocity.Magnitude > 0.5 and targetChar:FindFirstChild("Basketball") then
+                       char.Humanoid:MoveTo(torso.CFrame.p + torso.Velocity.unit * 7)
+                   elseif torso.Velocity.Magnitude < 0.5 and targetChar:FindFirstChild("Basketball") then
+                       char.Humanoid:MoveTo(torso.CFrame.p)
+                   elseif not targetChar:FindFirstChild("Basketball") then
+                       tr = false
                    end
+                   task.wait(0.1)
                end
            end
-       elseif key.KeyCode == Enum.KeyCode.U and not gpe and tr == true then
-           tr = false
        end
+   elseif key.KeyCode == Enum.KeyCode.U and not gpe and tr == true then
+       tr = false
    end
-)
+end)
