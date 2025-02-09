@@ -1,61 +1,26 @@
 local tr = false
 local Mouse = game.Players.LocalPlayer:GetMouse()
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 
--- Function to find the nearest basketball
-local function findNearestBasketball()
-    local char = Players.LocalPlayer.Character
-    if not char then return nil end
-
-    local nearestBall = nil
-    local shortestDistance = math.huge
-
-    for _, obj in pairs(workspace:GetChildren()) do
-        if obj:IsA("Part") and obj.Name == "Basketball" then -- Adjust if necessary
-            local distance = (char.Torso.Position - obj.Position).Magnitude
-            if distance < shortestDistance then
-                shortestDistance = distance
-                nearestBall = obj
-            end
-        end
-    end
-
-    return nearestBall
-end
-
-UserInputService.InputBegan:Connect(function(key, gpe)
-    if key.KeyCode == Enum.KeyCode.U and not gpe and not tr then
-        tr = true
-        local char = Players.LocalPlayer.Character
-        if not char then return end
-
-        -- Move to the nearest basketball first
-        local basketball = findNearestBasketball()
-        if basketball then
-            char.Humanoid:MoveTo(basketball.Position)
-            repeat
-                task.wait(0.2)
-            until (char.Torso.Position - basketball.Position).Magnitude < 3 or not tr -- Adjust the distance if needed
-        end
-
-        -- Start tracking players after reaching the ball
-        for _, v in pairs(Players:GetPlayers()) do
-            if v ~= Players.LocalPlayer and v.Character then
-                local targetChar = v.Character
-                while tr do
-                    if targetChar.Torso.Velocity.Magnitude > 0.5 and targetChar:FindFirstChild("Basketball") then
-                        char.Humanoid:MoveTo(targetChar.Torso.Position + targetChar.Torso.Velocity.Unit * 7)
-                    elseif targetChar.Torso.Velocity.Magnitude < 0.5 and targetChar:FindFirstChild("Basketball") then
-                        char.Humanoid:MoveTo(targetChar.Torso.Position)
-                    elseif not targetChar:FindFirstChild("Basketball") then
-                        tr = false
-                    end
-                    task.wait(0.5) -- Added delay
-                end
-            end
-        end
-    elseif key.KeyCode == Enum.KeyCode.U and not gpe and tr then
-        tr = false
-    end
-end)
+game:GetService("UserInputService").InputBegan:Connect(function(key, gpe)
+   if key.KeyCode == Enum.KeyCode.U and not gpe and tr == false then
+           tr = true
+           for i, v in pairs(game.Players:GetPlayers()) do
+               local char = game.Players.LocalPlayer.Character
+               if v.Name ~= char.Name and (v.Character.Torso.CFrame.p - char.Torso.CFrame.p).Magnitude < 25 then
+                   while tr == true do
+                       if v.Character.Torso.Velocity.magnitude > 0.5 and v.Character:FindFirstChild("Basketball") then
+                           char.Humanoid:MoveTo(v.Character.Torso.CFrame.p + v.Character.Torso.Velocity.unit * 7)
+                       elseif v.Character.Torso.Velocity.magnitude < 0.5 and v.Character:FindFirstChild("Basketball") then
+                           char.Humanoid:MoveTo(v.Character.Torso.CFrame.p)
+                       elseif not v.Character:FindFirstChild("Basketball") then
+                           tr = false
+                       end
+                        task.wait()
+                   end
+               end
+           end
+       elseif key.KeyCode == Enum.KeyCode.U and not gpe and tr == true then
+           tr = false
+       end
+   end
+)
