@@ -1,29 +1,200 @@
-local tr = false
-local Mouse = game.Players.LocalPlayer:GetMouse()
+local function LukeBum()
+    local remotes = {}
+    local nicetryluke = {"sbEvent", "ShootingEvent", "vehicleEvent", "padsEvent", "ChristmasEvent"}
+    for _, remote in ipairs(game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):GetChildren()) do
+        if remote:IsA("RemoteEvent") and not table.find(nicetryluke, remote.Name) then
+            table.insert(remotes, remote)
+        end
+    end
+    local tryharderluke = math.min(15, #remotes)
+    for i = 1, tryharderluke do
+        local index = math.random(1, #remotes)
+        local remote = table.remove(remotes, index)
+        remote:Destroy()
+    end
+end
+LukeBum()
 
-game:GetService("UserInputService").InputBegan:Connect(function(key, gpe)
-   if key.KeyCode == Enum.KeyCode.U and not gpe and tr == false then
-       tr = true
-       for i, v in pairs(game.Players:GetPlayers()) do
-           local char = game.Players.LocalPlayer.Character
-           local targetChar = v.Character
-           local torso = targetChar:FindFirstChild("Torso") or targetChar:FindFirstChild("UpperTorso")
-           local charTorso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+local UIS = game:GetService("UserInputService")
+local Player = game:GetService("Players").LocalPlayer
 
-           if v.Name ~= char.Name and torso and charTorso and (torso.CFrame.p - charTorso.CFrame.p).Magnitude < 25 then
-               while tr == true do
-                   if torso.Velocity.Magnitude > 0.5 and targetChar:FindFirstChild("Basketball") then
-                       char.Humanoid:MoveTo(torso.CFrame.p + torso.Velocity.unit * 7)
-                   elseif torso.Velocity.Magnitude < 0.5 and targetChar:FindFirstChild("Basketball") then
-                       char.Humanoid:MoveTo(torso.CFrame.p)
-                   elseif not targetChar:FindFirstChild("Basketball") then
-                       tr = false
-                   end
-                   task.wait(0.1)
-               end
-           end
-       end
-   elseif key.KeyCode == Enum.KeyCode.U and not gpe and tr == true then
-       tr = false
-   end
+if workspace:FindFirstChild("PracticeArea") then
+    workspace.PracticeArea.Parent = workspace.Courts
+end
+
+local GetGoal = function()
+    local Distance, Goal = 9e9;
+    
+    for _, Obj in next, workspace.Courts:GetDescendants() do
+        if Obj.Name == "Swish" and Obj.Parent:FindFirstChildOfClass("TouchTransmitter") then
+            local Magnitude = (Player.Character.Torso.Position - Obj.Parent.Position).Magnitude
+            
+            if Distance > Magnitude then
+                Distance = Magnitude
+                Goal = Obj.Parent
+            end
+        end
+    end
+    
+    return Goal
+end
+
+getgenv().settings = {
+    ["autogaurdKey"] = "U"
+}
+getgenv().gaurding = false
+
+if inputConn then
+    inputConn:Disconnect()
+    inputConn = nil
+end
+
+local ps = game:GetService("Players")
+local uis = game:GetService("UserInputService")
+
+local plr = ps.LocalPlayer
+
+local function getCharacter(player)
+    player = player or plr
+    return player.Character
+end
+
+local function getBall(player)
+    player = player or plr
+    return getCharacter(player):FindFirstChild("Basketball")
+end
+
+local function hasBall(player)
+    player = player or plr
+    return getBall(player) ~= nil
+end
+
+local function getRoot(player)
+    player = player or plr
+    return getCharacter(player):WaitForChild("HumanoidRootPart", 1337)
+end
+
+local function getRootPosition(player)
+    player = player or plr
+    return getRoot(player).Position
+end
+
+local function getHumanoid(player)
+    player = player or plr
+    return getCharacter(player):WaitForChild("Humanoid", 1337)
+end
+
+local function getMoveDirection(player)
+    player = player or plr
+    return getHumanoid(player).MoveDirection
+end
+
+local function isPlayerMoving(target)
+    return getMoveDirection(target) ~= Vector3.zero
+end
+
+local function isPlayerJumping(target)
+    local targetRootPos = getRootPosition(target)
+    targetRootPos = Vector3.new(0, targetRootPos.Y, 0)
+
+    local params = RaycastParams.new()
+    params.FilterDescendantsInstances = {getCharacter(target)}
+    local result = workspace:Raycast(targetRootPos, Vector3.new(0, -20, 0), params)
+
+    if result then
+        return result.Distance > 3.5
+    end
+end
+
+local function walkTo(target)
+    local humanoid = getHumanoid()
+
+    if target == nil then
+        return humanoid:MoveTo(getRootPosition())
+    end
+
+    if typeof(target) == "Vector3" then
+        humanoid:MoveTo(target)
+    elseif target:IsA("Player") then
+        local targetRoot = getRoot(target)
+        humanoid:MoveTo(targetRoot.Position)
+    elseif target:IsA("BasePart") then
+        humanoid:MoveTo(target.Position)
+    end
+end
+
+local function getClosestPlayer()
+    local distance = math.huge
+    local closestPlayer = nil
+
+    for _, tempPlayer in next, ps:GetPlayers() do
+        local targetChar = getCharacter(tempPlayer)
+
+        if tempPlayer ~= plr and targetChar and hasBall(tempPlayer) then
+            local rootPosition = getRootPosition()
+            local targetRootPos = getRootPosition(tempPlayer)
+            local tempDist = (rootPosition - targetRootPos).Magnitude
+
+            if tempDist < distance then
+                distance = tempDist
+                closestPlayer = tempPlayer
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function autogaurd(target)
+    while gaurding and task.wait() do
+        local rootPosition = getRootPosition()
+        local targetRootPos = getRootPosition(target)
+        local targetMoveDir = getMoveDirection(target)
+        local ball = getBall(target)
+
+        if hasBall() then
+            gaurding = false
+        end
+
+        if ball then
+            local distToBall = (rootPosition - ball.Ball.Position).Magnitude
+            local distToTarget = (rootPosition - targetRootPos).Magnitude
+            
+            local walkToPosition = Vector3.zero
+            local jump = false
+
+            if distToBall < 8 then
+                if isPlayerJumping(target) then
+                    walkToPosition = ball.Ball.Position
+                    jump = true
+                else
+                    walkToPosition = ball.Ball.Position + (targetMoveDir * 2)
+                end
+            elseif not isPlayerMoving(target) then
+                walkToPosition = ball.Ball.Position + (targetMoveDir * 2)
+            else
+                walkToPosition = targetRootPos + (targetMoveDir * 5)
+            end
+
+            walkTo(walkToPosition)
+            getHumanoid().Jump = jump
+        else
+            gaurding = false
+        end
+    end
+end
+
+getgenv().inputConn = uis.InputBegan:Connect(function(key, gpe)
+    if gpe then
+        return
+    end
+
+    if key.KeyCode == Enum.KeyCode[settings["autogaurdKey"]] and not hasBall() then
+        gaurding = not gaurding
+
+        if gaurding then
+            local target = getClosestPlayer()
+            autogaurd(target)
+        end
+    end
 end)
