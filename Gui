@@ -7,27 +7,27 @@ if not Rayfield then
 end
 
 local Window = Rayfield:CreateWindow({
-    Name = "Vision Hub",
-    LoadingTitle = "Vision Script",
-    LoadingSubtitle = "by Vision",
+    Name = "Kool Hub",
+    LoadingTitle = "Kool Script",
+    LoadingSubtitle = "by Coolguy",
     ConfigurationSaving = {
        Enabled = false,
-       FileName = "Vision Script Hub"
+       FileName = "coolguy Script Hub"
     },
     Discord = {
-       Enabled = true,
-       Invite = "GYH92be25Z",
+       Enabled = false,
+       Invite = "",
        RememberJoins = true
     },
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
-       Title = "Vision Script Hub| Key",
+       Title = "Kool Script Hub| Key",
        Subtitle = "Link In Discord Server",
        Note = "Join Server From Misc Tab",
        FileName = "BladeBallKey",
        SaveKey = false,
        GrabKeyFromSite = true,
-       Key = {"https://pastebin.com/raw/KT2YvsJ8"}
+       Key = {""}
     }
 })
 
