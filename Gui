@@ -43,7 +43,7 @@ local Button = MainTab:CreateButton({
     Name = "Mobile Camlock",
     Callback = function()
         -- The function that takes place when the button is pressed
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/PunchMadeScript/Vision-Hoopz/refs/heads/main/Camlock"))();
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/LeomarDaBest/Hoopz2/refs/heads/main/Camlock"))();
     end,
 })
 
@@ -51,7 +51,7 @@ local Button = MainTab:CreateButton({
     Name = "Auto Guard (U)",
     Callback = function()
         -- The function that takes place when the button is pressed
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/PunchMadeScript/Vision-Hoopz/refs/heads/main/Auto%20Guard"))();
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/LeomarDaBest/Hoopz2/refs/heads/main/Auto%20Guard"))();
     end,
 })
 
@@ -59,6 +59,6 @@ local Button = MainTab:CreateButton({
     Name = "PC Camlock",
     Callback = function()
         -- The function that takes place when the button is pressed
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/PunchMadeScript/Vision-Hoopz/refs/heads/main/PC%20Camlock"))();
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/LeomarDaBest/Hoopz2/refs/heads/main/PC%20Camlock"))();
     end,
 })
